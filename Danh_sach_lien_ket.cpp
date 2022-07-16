@@ -78,17 +78,11 @@ void show(node phead){
    }
 }
 void ptchan (node phead){
-	int min;
 	for (node p = phead; p != NULL; p=p->next){
-		min = p->info;
-		for(node p2 = p->next ; p2 != NULL ; p2 = p2->next){
-			if(p2->info < min){
-				min = p2->info;
-			}
+		if(p->info % 2 == 0){
+			cout << p->info << " ";
 		}
-		swap(p->info,min);
 	}
-	show(phead);
 }
 int snt (int n){
 	for (int i = 2;i*i <= n; i++){
@@ -115,7 +109,13 @@ int max (node phead){
 	return max;
 }
 void interchange (node phead){
-	
+	for (node p = phead; p!= NULL; p=p->next){
+		for (node q = phead; q!= NULL; q=q->next){
+			if (p->info < q->info){
+				swap(p->info,q->info);
+			}
+		}
+	}	
 }
 int main(){
     node phead;
@@ -123,6 +123,8 @@ int main(){
     show(phead);
     cout<<endl;
     ptchan(phead);
+    cout << "\n";
+    interchange(phead);
     show(phead);
 	return 0;
 }
