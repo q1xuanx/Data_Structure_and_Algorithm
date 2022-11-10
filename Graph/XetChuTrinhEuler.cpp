@@ -54,12 +54,25 @@ void findPath (int i, graph &g, stack &s){
 	putValue(s,i);
 }
 //stack s;
-
+int timBac (graph g, int dinh){
+	int bac = 0;
+	for (int i = 0; i < g.n; i++){
+		if (g.a[dinh][i] == 1){
+			bac++;
+		}
+	}
+	return bac;
+}
 int checkEuler (graph g, stack &s){
 	int i,j;
 	int x = 0;
+	for (int i = 0; i < g.n; i++){
+		if (timBac(g,i) > 0){
+			x = i;
+			break;
+		}
+	}
 	graph t = g;
-	//stack s;
 	init(s);
 	findPath(x,t,s);
 	for (int i = 0; i < t.n;i++){
@@ -69,8 +82,8 @@ int checkEuler (graph g, stack &s){
 			}
 		}
 	}
+	if (s.ar[0] != s.ar[s.size-1]) return 0;
 	cout << "\nCo chu trinh euler: ";
-	//printEuler(s);
 	return 1;	
 }
 void printEuler (stack s){
@@ -78,17 +91,51 @@ void printEuler (stack s){
 		cout << s.ar[i] << " ";
 	}
 }
+int checkDuongDiEuler(graph g, stack s){
+	int i,j;
+	int x = 0;
+	int cnt = 0;
+	for (int i = 0; i < g.n; i++){
+		if (timBac(g,i) % 2 != 0){
+			x = i;
+			cnt++;
+			//break;
+		}
+	}
+	if (cnt != 2) return 0;
+	graph t = g;
+	init(s);
+	findPath(x,t,s);
+	for (int i = 0; i < t.n;i++){
+		for (int j = 0;j < t.n; j++){
+			if (t.a[i][j] == 1){
+				return 0;
+			}
+		}
+	}
+	if (s.ar[0] == s.ar[s.size-1]) return 0;
+	cout << "\nCo duong di euler: ";
+	return 1;	
+}
 int main(){
 	graph g;
 	stack s;
+	stack s2;
 	int read = readFile(link,g);
 	if (read){
 		cout << "\nDoc file thang cong du lieu trong file: \n";
 		print(g);
 		cout << "\n";
-		int check = checkEuler(g,s);
-		if (check) printEuler(s);
+		int check1 = checkEuler(g,s);
+		if (check1) {
+			printEuler(s);
+			cout << '\n';
+		}
 		else cout << "Khong co chu trinh euler\n";
+		int check2 = checkDuongDiEuler(g,s);
+		if (check2){
+			printEuler(s2);
+		}else cout << "Khong co duong di Euler\n";
 	}
 	return 0;
 }
