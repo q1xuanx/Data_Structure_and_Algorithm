@@ -79,6 +79,7 @@ void prim (graph g){
 						canhnhonhat.u = i;
 						canhnhonhat.v = j;
 						canhnhonhat.value = g.a[i][j];
+						mn = g.a[i][j];
 					}
 				}
 			}
@@ -162,11 +163,14 @@ int main(){
 		cout << "\nDoc file thanh cong du lieu trong file la\n";
 		print(g);
 		cout << "\n";
-		cout << "\nThuat toan prime\n";
+		cout << "\n**************************************\n";
+		cout << "\nThuat toan PRIME\n";
 		prim(g);
 		cout << "\n";
-		cout << "\nThuat toan kruskal\n";
+		cout << "\n**************************************\n";
+		cout << "\nThuat toan Kruskal\n";
 		kruskal(g);
-	}
+		cout << "\n**************************************\n";
+	}else cout << "\nDoc file that bai !\n";
 	return 0;
 }
