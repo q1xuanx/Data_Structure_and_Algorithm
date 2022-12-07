@@ -1,141 +1,189 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
-#define link "C:/Users/Administrator/Desktop/B2/PhamHoangNhan_2180605539/input.txt"
+#define link "input.txt"
 #define MAX 100
-struct graph {
-	int n;
-	int a[MAX][MAX];
+struct graph
+{
+    int n, a[MAX][MAX];
 };
-struct stack {
-	int ar[MAX];
-	int size;
+struct stack{
+    int size, ar[MAX];
 };
-int readFile (char tenFile[1001],graph &g){
-	ifstream in (tenFile);
-	if (!in){
-		cerr << "\nError !\n";
-		return 0;
-	}
-	in >> g.n;
-	for (int i =0; i < g.n; i++){
-		for (int j = 0; j < g.n; j++){
-			in >> g.a[i][j];
-		}
-	}
-	return 1;
+int readFile(char tenLink[], graph &g){
+    ifstream in(tenLink);
+    if (!in)
+    {
+        cerr << "\nErorr!";
+        return 0;
+    }
+    in >> g.n;
+    for (int i = 0; i < g.n; i++)
+    {
+        for (int j = 0; j < g.n; j++)
+        {
+            in >> g.a[i][j];
+        }
+    }
+    return 1;
 }
-void print (graph g){
-	cout << g.n << "\n";
-	for (int i = 0; i < g.n; i++){
-		for (int j = 0; j < g.n; j++){
-			cout << g.a[i][j] << " ";
-		}
-		cout << "\n";
-	}
+void print(graph g)
+{
+    cout << g.n << "\n";
+    for (int i = 0; i < g.n; i++)
+    {
+        for (int j = 0; j < g.n; j++)
+        {
+            cout << g.a[i][j] << " ";
+        }
+        cout << "\n";
+    }
+}
+void demBacCuaDinh (graph g){
+    int cnt = 0;
+    int cntarr[MAX];
+    for (int i = 0; i < g.n; i++){
+        int j = 0;
+        cnt = 0; 
+        while (j < g.n){
+            if (g.a[i][j] != 0){
+                cnt++;
+            }
+            j++;
+        }
+        cntarr[i] = cnt;
+    }
+    cout << "\nSo bac cua cac dinh \n";
+    for (int i = 0; i < g.n; i++){
+        cout << i << " " << cntarr[i] << "\n";
+    }
+}
+void push (stack &s, int value){
+    if (s.size + 1 > 100){
+        return;
+    }
+    s.ar[s.size] = value;
+    s.size++;
 }
 void init (stack &s){
-	s.size = 0;
+    s.size = 0;
 }
-void putValue (stack &s, int value){
-	if (s.size + 1 >= 100){
-		return;
-	}
-	s.ar[s.size] = value;
-	s.size++;
+void timDuongDi (graph &g, stack &s, int i){
+    for (int j = 0; j < g.n; j++){
+        if (g.a[i][j] != 0){
+            g.a[i][j] = g.a[j][i] = 0;
+            timDuongDi(g,s,j);
+        }
+    }
+    push(s,i);
 }
-void findPath (int i, graph &g, stack &s){
-	for (int j = 0; j < g.n; j++){
-		if (g.a[i][j] != 0){
-			g.a[i][j] = g.a[j][i] = 0;
-			findPath(j,g,s);
-		}
-	}
-	putValue(s,i);
-}
-//stack s;
-int timBac (graph g, int dinh){
-	int bac = 0;
-	for (int i = 0; i < g.n; i++){
-		if (g.a[dinh][i] == 1){
-			bac++;
-		}
-	}
-	return bac;
+int timDinhPhuHop (graph g){
+    int cnt = 0, v = 0;
+    for (int i = 0; i < g.n; i++){
+        cnt = 0;
+        for (int j = 0; j < g.n; j++){
+            if (g.a[i][j] != 0){
+                cnt++;
+            }
+        }
+        if (cnt > 0){
+            v = i;
+            return v;
+        }
+    }
+    return -1;
 }
 int checkEuler (graph g, stack &s){
-	int i,j;
-	int x = 0;
-	for (int i = 0; i < g.n; i++){
-		if (timBac(g,i) > 0){
-			x = i;
-			break;
-		}
-	}
-	graph t = g;
-	init(s);
-	findPath(x,t,s);
-	for (int i = 0; i < t.n;i++){
-		for (int j = 0;j < t.n; j++){
-			if (t.a[i][j] == 1){
-				return 0;
-			}
-		}
-	}
-	if (s.ar[0] != s.ar[s.size-1]) return 0;
-	cout << "\nCo chu trinh euler: ";
-	return 1;	
+    int x = 0;
+    int timDinh = timDinhPhuHop(g);
+    if (timDinh) {
+        cout << "\nKhong co dinh phu hop ! ";
+        return 0;
+    }else{ 
+        x = timDinhPhuHop(g);
+    }
+    init(s);
+    graph temp = g;
+    timDuongDi(temp,s,x);
+    for (int i = 0; i < temp.n; i++){
+        for (int j = 0; j < temp.n; j++){
+            if (temp.a[i][j] != 0){
+                return 0;
+            }
+        }
+    }
+    if (s.ar[0] != s.ar[s.size - 1]){
+        return 0;
+    }else {
+        return 1;
+    }
 }
-void printEuler (stack s){
-	for (int i = 0; i < s.size; i++){
-		cout << s.ar[i] << " ";
-	}
+void printStack(stack s){
+    for (int i = 0; i < s.size-1; i++){
+        cout << s.ar[i] << "->";
+    }
+    cout << s.ar[s.size] << "\n";
 }
-int checkDuongDiEuler(graph g, stack s){
-	int i,j;
-	int x = 0;
-	int cnt = 0;
-	for (int i = 0; i < g.n; i++){
-		if (timBac(g,i) % 2 != 0){
-			x = i;
-			cnt++;
-			//break;
-		}
-	}
-	if (cnt != 2) return 0;
-	graph t = g;
-	init(s);
-	findPath(x,t,s);
-	for (int i = 0; i < t.n;i++){
-		for (int j = 0;j < t.n; j++){
-			if (t.a[i][j] == 1){
-				return 0;
-			}
-		}
-	}
-	if (s.ar[0] == s.ar[s.size-1]) return 0;
-	cout << "\nCo duong di euler: ";
-	return 1;	
+int timDinhPhuHop2 (graph g){
+    int v = 0, cnt = 0;
+    for (int i = 0; i < g.n; i++){
+        cnt = 0;
+        for (int j = 0; j < g.n; j++){
+            if (g.a[i][j] != 0){
+                cnt++;
+            }
+        }
+        if (cnt % 2 != 0){
+            v = i;
+            return v;
+        }
+    }
+    return -1;
+}
+int duongDiEuler (graph g, stack &t){
+    int x = 0;
+    if (timDinhPhuHop2(g)){
+        cout << "\nKhong co dinh phu hop !";
+        return 0;
+    }else {
+        x = timDinhPhuHop2(g);
+    }
+    init(t);
+    graph tmp = g;
+    timDuongDi(tmp,t,x);
+    for (int i = 0; i < tmp.n; i++){
+        for (int j = 0; j < tmp.n; j++){
+            if (tmp.a[i][j] != 0){
+                return 0;
+            }
+        }
+    }
+    if (t.ar[0] == t.ar[t.size - 1]){
+        return 0;
+    }else {
+        return 1;
+    }
 }
 int main(){
-	graph g;
-	stack s;
-	stack s2;
-	int read = readFile(link,g);
-	if (read){
-		cout << "\nDoc file thang cong du lieu trong file: \n";
-		print(g);
-		cout << "\n";
-		int check1 = checkEuler(g,s);
-		if (check1) {
-			printEuler(s);
-			cout << '\n';
-		}
-		else cout << "Khong co chu trinh euler\n";
-		int check2 = checkDuongDiEuler(g,s);
-		if (check2){
-			printEuler(s2);
-		}else cout << "Khong co duong di Euler\n";
-	}
-	return 0;
+    graph g;
+    stack s;
+    int read = readFile(link,g);
+    if (read){ 
+        print(g);
+        demBacCuaDinh(g);
+        if (checkEuler(g,s)){
+            cout << "\nCo chu trinh Euler: ";
+            printStack(s);
+        }else {
+            cout << "\nKhong co chu trinh Euler !";
+        }
+        if (duongDiEuler(g,s)){
+            cout << "\nCo duong di Euler !";
+            printStack(s);
+        }else {
+            cout << "\nKhong co duong di Euler !";
+        }
+        cout << "\nDebug...Ok\n";
+    }
+    return 0;
 }
